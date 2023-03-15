@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sigil Maker</title>
+    <meta name="description" content="Create a sigil, based on user input." />
+    <meta name="author" content="Bret Bernhoft" />
+    <style>
+      * {
+        padding: 0px;
+        border: none;
+        margin: 0px;
+        font-family: sans-serif;
+      }
+      canvas {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Sigil Maker</h1>
+    <input type="text" id="inputText" placeholder="Enter your text here" />
+    <button onclick="generateSigil()">Generate Sigil</button>
+    <canvas id="sigilCanvas" width="300" height="300"></canvas>
+    <script>
+      function generateSigil() {
+        const inputText = document.getElementById("inputText").value;
+        const canvas = document.getElementById("sigilCanvas");
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const seed = generateSeed(inputText);
+        const random = new Random(seed);
+        const points = generatePoints(random, 8, canvas.width, canvas.height);
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+          ctx.lineTo(points[i].x, points[i].y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      }
+      function generateSeed(str) {
+        let seed = 0;
+        for (let i = 0; i < str.length; i++) {
+          seed += str.charCodeAt(i);
+        }
+        return seed;
+      }
+      class Random {
+        constructor(seed) {
+          this.seed = seed;
+        }
+        next() {
+          const x = Math.sin(this.seed++) * 10000;
+          return x - Math.floor(x);
+        }
+      }
+      function generatePoints(random, numPoints, width, height) {
+        const points = [];
+        for (let i = 0; i < numPoints; i++) {
+          points.push({
+            x: random.next() * width,
+            y: random.next() * height,
+          });
+        }
+        return points;
+      }
+    </script>
+  </body>
+</html>
